@@ -1,42 +1,42 @@
 openapi: 3.1.0
 info:
   title: Google Drive Concept Note Handler
-  description: Search, edit, and export Google Docs from a specific Drive folder.
-  version: 1.0.3
+  description: Search, retrieve, export, and upload Google Docs for editing and Word conversion.
+  version: 1.0.4
+
 servers:
   - url: https://www.googleapis.com
-    description: Google API main server
+    description: Google API Server
 
 paths:
   /drive/v3/files:
     get:
       operationId: searchDriveFilesInFolder
-      summary: Search for Google Docs by title inside a specific Google Drive folder.
+      summary: Search Google Docs by filename within a specific folder.
       parameters:
         - name: filenameQuery
           in: query
           required: true
-          description: Title or partial title of the document to search for.
-          example: Liquid VC
           schema:
             type: string
+          example: Liquid VC
+          description: Partial or full filename to search.
         - name: q
           in: query
           required: true
-          description: Full Drive query built from filenameQuery and folder restriction.
-          example: "'me' in owners and mimeType = 'application/vnd.google-apps.document' and name contains 'Liquid VC' and '1ogLLhjQd6zeruA-P561rgpag5AOi4pvR' in parents"
           schema:
             type: string
+          example: "'1ogLLhjQd6zeruA-P561rgpag5AOi4pvR' in parents and mimeType='application/vnd.google-apps.document' and name contains 'Liquid VC'"
+          description: Internal query string (GPT auto‑generates from filenameQuery).
         - name: fields
           in: query
           required: false
-          description: Comma-separated list of fields to include in the response.
           schema:
             type: string
-          example: "files(id, name)"
+          example: "files(id,name)"
       responses:
         '200':
-          description: Matching documents found inside the folder.
+          description: List of matching Google Docs
           content:
             application/json:
               schema:
@@ -55,12 +55,77 @@ paths:
   /docs/v1/documents/{documentId}:
     get:
       operationId: getGoogleDocContent
-      summary: Retrieve content from a Google Docs document.
+      summary: Retrieve content from a Google Doc.
       parameters:
         - name: documentId
           in: path
           required: true
-          description: The ID of the Google Docs document to retrieve.
           schema:
             type: string
-      res
+      responses:
+        '200':
+          description: Google Doc content
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /drive/v3/files/{fileId}/export:
+    get:
+      operationId: exportDocAsWord
+      summary: Export a Google Doc as a Word document (.docx).
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: mimeType
+          in: query
+          required: true
+          schema:
+            type: string
+          example: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+      responses:
+        '200':
+          description: Binary Word document
+          content:
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+              schema:
+                type: string
+                format: binary
+
+  /upload/drive/v3/files:
+    post:
+      operationId: uploadWordFile
+      summary: Upload a Word file to Google Drive.
+      parameters:
+        - name: uploadType
+          in: query
+          required: true
+          schema:
+            type: string
+          example: multipart
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                metadata:
+                  type: string
+                  format: binary
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Upload success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string }
+                  name: { type: string }
