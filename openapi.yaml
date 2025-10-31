@@ -1,11 +1,12 @@
 openapi: 3.1.0
 info:
   title: Google Drive Concept Note Handler
-  description: Search, edit, and export Google Docs inside a specific Drive folder.
+  description: Search, edit, and export Google Docs from a specific Drive folder.
   version: 1.0.3
 servers:
   - url: https://www.googleapis.com
-    description: Google API main endpoint
+    description: Google API main server
+
 paths:
   /drive/v3/files:
     get:
@@ -22,13 +23,14 @@ paths:
         - name: q
           in: query
           required: true
-          description: Drive query built from filenameQuery and folder restriction.
+          description: Full Drive query built from filenameQuery and folder restriction.
           example: "'me' in owners and mimeType = 'application/vnd.google-apps.document' and name contains 'Liquid VC' and '1ogLLhjQd6zeruA-P561rgpag5AOi4pvR' in parents"
           schema:
             type: string
         - name: fields
           in: query
           required: false
+          description: Comma-separated list of fields to include in the response.
           schema:
             type: string
           example: "files(id, name)"
@@ -58,76 +60,7 @@ paths:
         - name: documentId
           in: path
           required: true
+          description: The ID of the Google Docs document to retrieve.
           schema:
             type: string
-      responses:
-        '200':
-          description: Google Docs content.
-          content:
-            application/json:
-              schema:
-                type: object
-
-  /drive/v3/files/{fileId}/export:
-    get:
-      operationId: exportDocAsWord
-      summary: Export a Google Doc as a Word document (.docx).
-      parameters:
-        - name: fileId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: mimeType
-          in: query
-          required: true
-          schema:
-            type: string
-          example: application/vnd.openxmlformats-officedocument.wordprocessingml.document
-      responses:
-        '200':
-          description: Binary Word document.
-          content:
-            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
-              schema:
-                type: string
-                format: binary
-
-  /upload/drive/v3/files:
-    post:
-      operationId: uploadWordFile
-      summary: Upload a Word file to Drive with a new file name.
-      parameters:
-        - name: uploadType
-          in: query
-          required: true
-          schema:
-            type: string
-          example: multipart
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                metadata:
-                  type: string
-                  format: binary
-                  description: JSON metadata with name and mimeType.
-                file:
-                  type: string
-                  format: binary
-                  description: Binary Word document to upload.
-      responses:
-        '200':
-          description: File uploaded to Google Drive.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  name:
-                    type: string
+      res
