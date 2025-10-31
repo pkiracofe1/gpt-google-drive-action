@@ -1,0 +1,22 @@
+{
+  "schema_version": "v1",
+  "name_for_model": "googleDriveConceptHandler",
+  "name_for_human": "Google Drive Concept Handler",
+  "description_for_model": "Searches for a Google Doc in a specific folder, retrieves its content, lets user edit it, then exports and uploads as Word.",
+  "description_for_human": "Edit and export Google Docs from a specific Drive folder as Word files.",
+  "auth": {
+    "type": "oauth",
+    "client_url": "https://accounts.google.com/o/oauth2/v2/auth",
+    "authorization_url": "https://accounts.google.com/o/oauth2/v2/auth",
+    "token_url": "https://oauth2.googleapis.com/token",
+    "scope": "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/documents.readonly"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://YOUR_DOMAIN_OR_HOST_PATH/openapi.yaml",
+    "is_user_authenticated": true
+  },
+  "logo_url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Google_Drive_logo.png",
+  "contact_email": "you@example.com",
+  "legal_info_url": "https://policies.google.com/terms"
+}
